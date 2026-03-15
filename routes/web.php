@@ -12,7 +12,13 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+Route::view('/welcome', 'welcome');//default - page
 
-Route::get('/', function () {
-    return view('welcome');
-});
+
+Route::view('/', 'pages.home')->name('home');
+Route::view('/about', 'pages.about')->name('about');
+Route::view('/services', 'pages.services')->name('services');
+Route::view('/gallery', 'pages.gallery')->name('gallery');
+Route::view('/contacts', 'pages.contacts')->name('contacts');
+
+Route::view('/admin', 'admin.dashboard')->name('admin.dashboard');

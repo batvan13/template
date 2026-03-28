@@ -1,66 +1,267 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Laravel Small Business Template
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A reusable Laravel 10 starter template for small business websites. Includes an admin panel with CMS capabilities and a dynamic public frontend.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Modules included
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+**Admin panel**
+- Login / logout with session authentication
+- Change password (`/admin/password`)
+- Forgot/reset password via email (`/admin/forgot-password`)
+- Dashboard with live counts
+- Services CRUD (create, edit, toggle active, delete, sort order, pagination)
+- Gallery CRUD (image upload + video URL, toggle active, delete, sort order, pagination)
+- Page Sections editor (per-page content blocks editable from admin)
+- Site Settings (name, tagline, contact info, social links, Google Maps URL)
+- Rate limiting on login, password reset, and contact form submission
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+**Public frontend**
+- Home page with dynamic sections (hero, services preview, about, gallery preview, contacts)
+- About, Services, Gallery, Contacts pages — all content managed from admin
+- Gallery page renders active image and video items from database
+- Inquiry / contact form on Contacts page (validates, sends mail to `contact_email` setting)
+- Business action buttons partial (call, email, directions — driven by settings)
+- Header and footer driven by settings
+- Full SEO head: `<title>`, `meta description`, `og:title`, `og:description`, `og:image`, `canonical`
+- Dynamic `sitemap.xml` at `/sitemap.xml`
+- `robots.txt` at `/robots.txt` (disallows `/admin`, links to sitemap)
+- Cookie consent banner (stores consent in browser cookie, 365 days)
+- 404 error page
 
-## Learning Laravel
+**Developer conveniences**
+- `setting('key', $default)` — global site settings helper
+- `page_section('page', 'section')` — CMS content helper
+- Both helpers use static request-level caching
+- Demo seeders for all content (idempotent — safe to re-run)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+---
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## Requirements
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- PHP 8.1+
+- Laravel 10
+- MySQL 5.7+ / MariaDB 10.3+
+- Node.js 18+
+- Composer 2
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## Installation
 
-### Premium Partners
+```bash
+git clone <repo-url> my-project
+cd my-project
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+cp .env.example .env
 
-## Contributing
+composer install
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+php artisan key:generate
+```
 
-## Code of Conduct
+Edit `.env` and set at minimum:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```
+APP_URL=http://localhost:8000
 
-## Security Vulnerabilities
+DB_DATABASE=your_database
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+> **`APP_URL` must be correct.** It is used to generate sitemap URLs, canonical meta tags, and OG URLs.
+> On production, set it to your actual domain (`https://yourdomain.com`).
 
-## License
+Then:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+php artisan migrate --seed
+
+php artisan storage:link
+
+npm install
+npm run build
+
+php artisan serve
+```
+
+Site is available at `http://localhost:8000`.
+
+> **`storage:link` is required.** Gallery images are stored in `storage/app/public/gallery/`
+> and served via the `public/storage` symlink. Without this command, uploaded images will not display.
+
+---
+
+## Admin credentials (demo)
+
+| | |
+|---|---|
+| Admin URL | `/admin` |
+| Email | `admin@demo.com` |
+| Password | `password` |
+
+> **Change both before deploying to production.**
+> `AdminUserSeeder` uses `updateOrCreate`, so re-running it will reset the password if the email already exists.
+
+---
+
+## После инсталация — първи стъпки
+
+В правилния ред след `php artisan migrate --seed`:
+
+1. **Влез в admin** на `/admin` с `admin@demo.com` / `password`
+2. **Смени admin паролата** преди каквото и да е друго
+3. **Admin → Настройки** — обнови `site_name`, `site_tagline`, `contact_phone`, `contact_email`, `address`
+4. **Конфигурирай SMTP** в `.env` — задължително, за да работи контактната форма (виж секцията по-долу)
+5. **Admin → Услуги** — замени или редактирай 3-те примерни услуги с реални
+6. **Admin → Секции** — редактирай текстовете на hero, about, contact и другите секции за конкретния бизнес
+7. **Admin → Галерия** *(по желание)* — добави снимки или видео URL-и; gallery секцията на home страницата се появява автоматично щом има поне един активен запис
+8. **Admin → Настройки** *(по желание)* — добави `google_maps_url` и URL-и за социалните мрежи
+
+---
+
+## Admin панел — ориентация
+
+| Раздел | Управлява |
+|---|---|
+| **Настройки** | Глобални данни за сайта: телефон, имейл, адрес, Google Maps, социални мрежи, слоган |
+| **Секции** | Текстово съдържание по страница: заглавия, описания, бутони на hero/about/contact и др. |
+| **Услуги** | Списъкът с услуги, показван на Services страницата и в preview на home |
+| **Галерия** | Снимки (upload) и видео URL-и; показват се на Gallery страницата и в preview на home |
+
+**Настройки ≠ Секции.** Настройките са глобален контакт/идентичност. Секциите са per-page текстово CMS съдържание.
+
+---
+
+## Поведение, което е добре да се знае
+
+**Home gallery preview** се показва само когато има поне един активен gallery елемент. При празна галерия секцията е напълно скрита.
+
+**Action buttons** (Обади се / Изпрати имейл / Намери ни) се рендерират само когато съответната настройка е попълнена (`contact_phone`, `contact_email`, `google_maps_url`). При липсващи и трите настройки бутоните изчезват от CTA блоковете на Services и Gallery страниците.
+
+**Services preview на home** показва максимум 3 активни услуги. Пълният списък е достъпен на Services страницата чрез "Виж всички услуги".
+
+---
+
+## Изисквания за контактната форма
+
+За да работи inquiry формата на Contacts страницата са нужни **и двете** едновременно:
+
+**1. Коректен mail driver в `.env`:**
+
+```
+MAIL_MAILER=smtp
+MAIL_HOST=your-smtp-host
+MAIL_PORT=587
+MAIL_USERNAME=your-username
+MAIL_PASSWORD=your-password
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=no-reply@yourdomain.com
+MAIL_FROM_NAME="${APP_NAME}"
+```
+
+**2. Попълнен `contact_email` в Admin → Настройки.**
+
+Ако едното от двете липсва, формата ще върне грешка на посетителя и ще логне проблема. Тя никога не претендира за успех при неизпратен имейл.
+
+---
+
+## Преди пускане на живо
+
+**Environment**
+- [ ] `APP_ENV=production` и `APP_DEBUG=false` в `.env`
+- [ ] `APP_URL` е реалният production URL с `https://` (влияе на sitemap, canonical, OG tags)
+- [ ] SSL сертификат е активен
+
+**Build**
+- [ ] `php artisan storage:link` е изпълнен на production сървъра
+- [ ] `php artisan config:cache && php artisan route:cache && php artisan view:cache`
+- [ ] `npm run build` е изпълнен и compiled assets се сервират
+
+**Admin / Settings**
+- [ ] Admin паролата е сменена (`/admin/password`) — не е `password`
+- [ ] `site_name` и `site_tagline` са обновени
+- [ ] `contact_email` е обновен с реален адрес
+- [ ] `contact_phone` и `address` са попълнени
+
+**Mail**
+- [ ] SMTP е конфигуриран и тестван в `.env`
+- [ ] Тест: изпратено реално запитване от Contacts страницата
+
+**Content**
+- [ ] Поне една реална услуга е активна
+- [ ] Hero секцията е редактирана в Admin → Секции
+- [ ] Demo данните са заменени или премахнати
+
+**SEO / Indexing**
+- [ ] `/sitemap.xml` е достъпен и съдържа правилните URL-и
+- [ ] `/robots.txt` е достъпен и `Sitemap:` реда сочи към коректния домейн
+- [ ] Sitemap е submitнат в Google Search Console
+
+---
+
+## Project structure
+
+```
+app/
+  Http/Controllers/
+    Admin/              — AuthController, DashboardController,
+                          GalleryController, ServiceController,
+                          PageSectionController, SettingController,
+                          PasswordController, ForgotPasswordController,
+                          ResetPasswordController
+    PageController      — home, about, services, gallery, contacts
+    InquiryController   — public contact form submission
+    SitemapController   — generates /sitemap.xml
+  Http/Requests/
+    InquiryRequest      — contact form validation rules
+    Admin/              — StoreGalleryItemRequest, UpdateGalleryItemRequest
+  Mail/
+    InquiryMail         — mailable sent to contact_email on inquiry
+  Models/               — GalleryItem, Service, PageSection, SiteSetting, User
+  Exceptions/Handler    — ThrottleRequestsException → redirect-back with error
+  helpers.php           — setting(), page_section(), section_url()
+
+database/
+  migrations/           — services, page_sections, site_settings,
+                          gallery_items tables
+  seeders/              — AdminUserSeeder, ServiceSeeder,
+                          PageSectionSeeder, SiteSettingSeeder
+
+resources/views/
+  layouts/              — app.blade.php, admin.blade.php
+  pages/                — home, about, services, gallery, contacts
+  sections/home/        — hero, services-preview, about-preview,
+                          gallery-preview, contact-preview
+  partials/             — action-buttons (call / email / directions)
+  admin/                — dashboard, gallery, services, sections,
+                          settings, auth (login, forgot-password,
+                          reset-password), password
+  mail/                 — inquiry.blade.php (plain HTML email)
+  components/           — header, footer, cookie-consent
+  errors/               — 404.blade.php
+  sitemap.blade.php     — XML template for /sitemap.xml
+```
+
+---
+
+## Notes for customization
+
+**Rename the site**
+Update `site_name` and `site_tagline` in Admin → Settings, or directly in `SiteSettingSeeder`.
+
+**Add a new page section**
+1. Add a row to `page_sections` (via seeder or admin)
+2. Call `page_section('page', 'section')` in the relevant Blade view
+
+**Add a new setting key**
+1. Add the key to `SiteSetting::KEYS` in `app/Models/SiteSetting.php`
+2. Add the validation rule in `SettingController::update()`
+3. Add the input field in `resources/views/admin/settings/edit.blade.php`
+
+**Gallery images**
+Uploaded images are stored at `storage/app/public/gallery/` and served via `public/storage/`.
+Run `php artisan storage:link` once after installation (or after re-cloning).
+On update or delete, the old file is automatically removed from disk.

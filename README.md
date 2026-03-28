@@ -15,13 +15,14 @@ A reusable Laravel 10 starter template for small business websites. Includes an 
 - Gallery CRUD (image upload + video URL, toggle active, delete, sort order, pagination)
 - Page Sections editor (per-page content blocks editable from admin)
 - Site Settings (name, tagline, contact info, social links, Google Maps URL)
+- Inquiries (list, detail, resend on mail failure)
 - Rate limiting on login, password reset, and contact form submission
 
 **Public frontend**
 - Home page with dynamic sections (hero, services preview, about, gallery preview, contacts)
 - About, Services, Gallery, Contacts pages — all content managed from admin
 - Gallery page renders active image and video items from database
-- Inquiry / contact form on Contacts page (validates, sends mail to `contact_email` setting)
+- Inquiry / contact form on Contacts page (validates, persists to DB, attempts mail to `contact_email`; admin Inquiries list/show/resend)
 - Business action buttons partial (call, email, directions — driven by settings)
 - Header and footer driven by settings
 - Full SEO head: `<title>`, `meta description`, `og:title`, `og:description`, `og:image`, `canonical`
@@ -35,6 +36,19 @@ A reusable Laravel 10 starter template for small business websites. Includes an 
 - `page_section('page', 'section')` — CMS content helper
 - Both helpers use static request-level caching
 - Demo seeders for all content (idempotent — safe to re-run)
+
+---
+
+## Operational documentation (source of truth)
+
+| Doc | Purpose |
+|-----|---------|
+| [docs/00_PROJECT_CONTEXT.md](docs/00_PROJECT_CONTEXT.md) | Master: stack, entities, rules, definition of done |
+| [docs/01_CURSOR_RULES.md](docs/01_CURSOR_RULES.md) | Executor (Cursor) rules |
+| [docs/02_TASK_TEMPLATE.md](docs/02_TASK_TEMPLATE.md) | Task template |
+| [docs/03_ADMIN_STRUCTURE.md](docs/03_ADMIN_STRUCTURE.md) | Admin modules and responsibilities |
+| [docs/04_CORE_SYSTEM.md](docs/04_CORE_SYSTEM.md) | Public system model and content flow |
+| [docs/05_DB_ARCHITECTURE.md](docs/05_DB_ARCHITECTURE.md) | Tables and data ownership |
 
 ---
 
@@ -164,7 +178,7 @@ MAIL_FROM_NAME="${APP_NAME}"
 
 **2. Попълнен `contact_email` в Admin → Настройки.**
 
-Ако едното от двете липсва, формата ще върне грешка на посетителя и ще логне проблема. Тя никога не претендира за успех при неизпратен имейл.
+Запитването се записва в базата; при липсващ получател или грешка при mail статусът остава `received` / `mail_failed` — UI съобщава само, че запитването е **получено**, не че имейлът е доставен.
 
 ---
 
@@ -210,8 +224,8 @@ app/
     Admin/              — AuthController, DashboardController,
                           GalleryController, ServiceController,
                           PageSectionController, SettingController,
-                          PasswordController, ForgotPasswordController,
-                          ResetPasswordController
+                          InquiryController, PasswordController,
+                          ForgotPasswordController, ResetPasswordController
     PageController      — home, about, services, gallery, contacts
     InquiryController   — public contact form submission
     SitemapController   — generates /sitemap.xml
@@ -220,13 +234,15 @@ app/
     Admin/              — StoreGalleryItemRequest, UpdateGalleryItemRequest
   Mail/
     InquiryMail         — mailable sent to contact_email on inquiry
-  Models/               — GalleryItem, Service, PageSection, SiteSetting, User
+  Models/               — GalleryItem, Service, PageSection, SiteSetting,
+                          Inquiry, User
   Exceptions/Handler    — ThrottleRequestsException → redirect-back with error
   helpers.php           — setting(), page_section(), section_url()
+  Support/              — GalleryImageProcessor (admin gallery → WebP)
 
 database/
-  migrations/           — services, page_sections, site_settings,
-                          gallery_items tables
+  migrations/           — page_sections, services, site_settings,
+                          gallery_items, inquiries tables
   seeders/              — AdminUserSeeder, ServiceSeeder,
                           PageSectionSeeder, SiteSettingSeeder
 
@@ -237,8 +253,8 @@ resources/views/
                           gallery-preview, contact-preview
   partials/             — action-buttons (call / email / directions)
   admin/                — dashboard, gallery, services, sections,
-                          settings, auth (login, forgot-password,
-                          reset-password), password
+                          settings, inquiries, auth (login,
+                          forgot-password, reset-password), password
   mail/                 — inquiry.blade.php (plain HTML email)
   components/           — header, footer, cookie-consent
   errors/               — 404.blade.php

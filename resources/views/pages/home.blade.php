@@ -1,11 +1,11 @@
 @extends('layouts.app')
 
-@section('title', 'Начало')
-@section('description', 'Начална страница')
+{{-- No title section — layout will render just the site name --}}
+@section('description', setting('site_tagline', 'Вашият надежден партньор.'))
 
 @section('content')
     @include('sections.home.hero')
-    @include('sections.home.services')
+    @include('sections.home.services-preview')
     @include('sections.home.about-preview')
     @include('sections.home.gallery-preview')
     @include('sections.home.contact-preview')

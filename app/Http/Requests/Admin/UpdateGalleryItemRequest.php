@@ -25,8 +25,8 @@ class UpdateGalleryItemRequest extends FormRequest
             'title'      => ['nullable', 'string', 'max:255'],
             'type'       => ['required', Rule::in(array_keys(GalleryItem::TYPES))],
             'image'      => $needsNewImage
-                                ? ['required', 'file', 'image', 'max:4096']
-                                : ['nullable', 'file', 'image', 'max:4096'],
+                                ? ['required', 'file', 'mimes:jpg,jpeg,png,webp', 'max:8192']
+                                : ['nullable', 'file', 'mimes:jpg,jpeg,png,webp', 'max:8192'],
             'video_url'  => $type === GalleryItem::TYPE_VIDEO
                                 ? ['required', 'url', 'max:255']
                                 : ['nullable', 'url', 'max:255'],
@@ -39,8 +39,8 @@ class UpdateGalleryItemRequest extends FormRequest
     {
         return [
             'image.required'     => 'Моля, качете изображение.',
-            'image.image'        => 'Файлът трябва да е изображение (jpg, png, gif, webp).',
-            'image.max'          => 'Изображението не може да надвишава 4 MB.',
+            'image.mimes'        => 'Файлът трябва да е JPG, PNG или WebP.',
+            'image.max'          => 'Изображението не може да надвишава 8 MB.',
             'video_url.required' => 'Моля, въведете URL на видеото.',
             'video_url.url'      => 'URL адресът не е валиден.',
         ];

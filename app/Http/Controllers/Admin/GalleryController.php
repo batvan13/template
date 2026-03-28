@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreGalleryItemRequest;
 use App\Http\Requests\Admin\UpdateGalleryItemRequest;
 use App\Models\GalleryItem;
+use App\Support\GalleryImageProcessor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -44,12 +45,30 @@ class GalleryController extends Controller
         ];
 
         if ($validated['type'] === GalleryItem::TYPE_IMAGE) {
-            $data['image_path'] = $request->file('image')->store('gallery', 'public');
+            try {
+                $data['image_path'] = app(GalleryImageProcessor::class)->process($request->file('image'));
+            } catch (\Throwable $e) {
+                return back()
+                    ->withInput()
+                    ->withErrors(['image' => 'Грешка при обработка на изображението.']);
+            }
+
+            try {
+                GalleryItem::create($data);
+            } catch (\Throwable $e) {
+                $path = $data['image_path'] ?? null;
+                if ($path && Storage::disk('public')->exists($path)) {
+                    Storage::disk('public')->delete($path);
+                }
+
+                return back()
+                    ->withInput()
+                    ->withErrors(['image' => 'Грешка при запис на изображението.']);
+            }
         } else {
             $data['video_url'] = $validated['video_url'];
+            GalleryItem::create($data);
         }
-
-        GalleryItem::create($data);
 
         return redirect()
             ->route('admin.gallery.index')
@@ -76,25 +95,45 @@ class GalleryController extends Controller
 
         if ($validated['type'] === GalleryItem::TYPE_IMAGE) {
             if ($request->hasFile('image')) {
-                // Replace existing image: delete old file first.
-                if ($galleryItem->image_path) {
-                    Storage::disk('public')->delete($galleryItem->image_path);
+                $oldPath = $galleryItem->image_path;
+                $newPath = null;
+
+                try {
+                    $newPath = app(GalleryImageProcessor::class)->process($request->file('image'));
+                } catch (\Throwable $e) {
+                    return back()
+                        ->withInput()
+                        ->withErrors(['image' => 'Грешка при обработка на изображението.']);
                 }
-                $data['image_path'] = $request->file('image')->store('gallery', 'public');
+
+                $data['image_path'] = $newPath;
+
+                try {
+                    $galleryItem->update($data);
+                } catch (\Throwable $e) {
+                    if ($newPath && Storage::disk('public')->exists($newPath)) {
+                        Storage::disk('public')->delete($newPath);
+                    }
+
+                    return back()
+                        ->withInput()
+                        ->withErrors(['image' => 'Грешка при обновяване на изображението.']);
+                }
+
+                if ($oldPath) {
+                    Storage::disk('public')->delete($oldPath);
+                }
             } else {
-                // Keep current image (no new file uploaded).
                 $data['image_path'] = $galleryItem->image_path;
+                $galleryItem->update($data);
             }
-            // Clearing video_url is already handled by $data default null.
         } else {
-            // Switching to or staying on video: delete any existing image file.
             if ($galleryItem->image_path) {
                 Storage::disk('public')->delete($galleryItem->image_path);
             }
             $data['video_url'] = $validated['video_url'];
+            $galleryItem->update($data);
         }
-
-        $galleryItem->update($data);
 
         return redirect()
             ->route('admin.gallery.index')

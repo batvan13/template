@@ -47,6 +47,22 @@
                 </p>
             @endif
 
+            @if(count($faqItems) > 0)
+                <section class="border-t border-gray-100 py-10" aria-labelledby="service-faq-heading">
+                    <h2 id="service-faq-heading" class="text-xl font-semibold tracking-tight text-gray-900">
+                        Често задавани въпроси
+                    </h2>
+                    <div class="mt-6 space-y-8">
+                        @foreach($faqItems as $item)
+                            <div>
+                                <h3 class="text-base font-semibold text-gray-900">{{ $item['question'] }}</h3>
+                                <p class="mt-2 text-base leading-relaxed text-gray-700 whitespace-pre-line">{{ $item['answer'] }}</p>
+                            </div>
+                        @endforeach
+                    </div>
+                </section>
+            @endif
+
             <section class="border-t border-gray-100 py-10" aria-labelledby="service-cta-heading">
                 <h2 id="service-cta-heading" class="text-xl font-semibold tracking-tight text-gray-900">
                     Запитване
@@ -88,5 +104,24 @@
         ],
     ]);
 @endphp
-<script type="application/ld+json">{!! json_encode($serviceLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
+<script type="application/ld+json">{!! json_encode($serviceLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
+@if(count($faqItems) > 0)
+@php
+    $faqLd = [
+        '@context' => 'https://schema.org',
+        '@type' => 'FAQPage',
+        'mainEntity' => array_map(static function (array $item) {
+            return [
+                '@type' => 'Question',
+                'name' => $item['question'],
+                'acceptedAnswer' => [
+                    '@type' => 'Answer',
+                    'text' => $item['answer'],
+                ],
+            ];
+        }, $faqItems),
+    ];
+@endphp
+<script type="application/ld+json">{!! json_encode($faqLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
+@endif
 @endpush

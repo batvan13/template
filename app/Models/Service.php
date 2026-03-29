@@ -14,9 +14,14 @@ class Service extends Model
         'slug',
         'short_description',
         'full_description',
+        'faq',
         'icon',
         'is_active',
         'sort_order',
+    ];
+
+    protected $casts = [
+        'faq' => 'array',
     ];
 
     public function scopeActive($query)

@@ -55,7 +55,36 @@ class PageController extends Controller
         return view('pages.service-show', [
             'service' => $service,
             'seoDescription' => $seoDescription,
+            'faqItems' => $this->normalizedServiceFaqItems($service->faq),
         ]);
+    }
+
+    /**
+     * @return list<array{question: string, answer: string}>
+     */
+    private function normalizedServiceFaqItems(mixed $faq): array
+    {
+        if (! is_array($faq)) {
+            return [];
+        }
+
+        $items = [];
+        foreach ($faq as $row) {
+            if (! is_array($row)) {
+                continue;
+            }
+            $question = isset($row['question']) ? trim((string) $row['question']) : '';
+            $answer = isset($row['answer']) ? trim((string) $row['answer']) : '';
+            if ($question === '' || $answer === '') {
+                continue;
+            }
+            $items[] = [
+                'question' => $question,
+                'answer' => $answer,
+            ];
+        }
+
+        return $items;
     }
 
     public function gallery(Request $request)

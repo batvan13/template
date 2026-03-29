@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\GalleryItem;
 use App\Models\Service;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class PageController extends Controller
 {
@@ -29,6 +30,31 @@ class PageController extends Controller
         return view('pages.services', [
             'page' => page_section('services', 'hero'),
             'services' => Service::active()->ordered()->get(),
+        ]);
+    }
+
+    public function serviceShow(string $slug)
+    {
+        $service = Service::active()->where('slug', $slug)->firstOrFail();
+
+        $rawDesc = $service->short_description ?: $service->full_description ?: '';
+        $seoDescription = Str::limit(
+            trim(preg_replace('/\s+/', ' ', strip_tags($rawDesc))),
+            160,
+            ''
+        );
+
+        if ($seoDescription === '') {
+            $seoDescription = Str::limit(
+                trim(strip_tags($service->title)),
+                160,
+                ''
+            );
+        }
+
+        return view('pages.service-show', [
+            'service' => $service,
+            'seoDescription' => $seoDescription,
         ]);
     }
 

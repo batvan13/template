@@ -39,7 +39,10 @@
                         @endif
 
                         <h2 class="text-base font-semibold text-gray-900">
-                            {{ $service->title }}
+                            <a href="{{ route('services.show', $service->slug) }}"
+                               class="text-gray-900 underline-offset-2 hover:underline">
+                                {{ $service->title }}
+                            </a>
                         </h2>
 
                         @php
@@ -51,6 +54,13 @@
                                 {{ $body }}
                             </p>
                         @endif
+
+                        <p class="mt-4">
+                            <a href="{{ route('services.show', $service->slug) }}"
+                               class="text-xs font-medium text-gray-900 underline-offset-2 hover:underline">
+                                Вижте детайли →
+                            </a>
+                        </p>
 
                     </div>
 

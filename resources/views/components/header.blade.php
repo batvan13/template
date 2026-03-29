@@ -25,7 +25,7 @@
                 За нас
             </a>
             <a href="{{ route('services') }}"
-               class="{{ request()->routeIs('services') ? 'text-gray-900 font-semibold' : 'text-gray-500 hover:text-gray-900' }} transition-colors">
+               class="{{ request()->routeIs('services', 'services.show') ? 'text-gray-900 font-semibold' : 'text-gray-500 hover:text-gray-900' }} transition-colors">
                 Услуги
             </a>
             <a href="{{ route('gallery') }}"
@@ -68,8 +68,8 @@
                class="{{ request()->routeIs('about') ? 'text-gray-900 font-semibold bg-gray-50' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50' }} rounded px-3 py-2.5 transition-colors">
                 За нас
             </a>
-            <a href="{{ route('services') }}"
-               class="{{ request()->routeIs('services') ? 'text-gray-900 font-semibold bg-gray-50' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50' }} rounded px-3 py-2.5 transition-colors">
+                <a href="{{ route('services') }}"
+                   class="{{ request()->routeIs('services', 'services.show') ? 'text-gray-900 font-semibold bg-gray-50' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50' }} rounded px-3 py-2.5 transition-colors">
                 Услуги
             </a>
             <a href="{{ route('gallery') }}"

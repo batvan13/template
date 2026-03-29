@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Service;
 use Illuminate\Http\Response;
 
 class SitemapController extends Controller
@@ -15,6 +16,10 @@ class SitemapController extends Controller
             route('gallery'),
             route('contacts'),
         ];
+
+        foreach (Service::active()->ordered()->get() as $service) {
+            $pages[] = route('services.show', $service->slug);
+        }
 
         return response()
             ->view('sitemap', ['pages' => $pages])

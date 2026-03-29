@@ -1,19 +1,19 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\ForgotPasswordController;
+use App\Http\Controllers\Admin\GalleryController;
+use App\Http\Controllers\Admin\InquiryController as AdminInquiryController;
+use App\Http\Controllers\Admin\PageSectionController;
+use App\Http\Controllers\Admin\PasswordController;
+use App\Http\Controllers\Admin\ResetPasswordController;
+use App\Http\Controllers\Admin\ServiceController;
+use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\InquiryController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\SitemapController;
-use App\Http\Controllers\Admin\AuthController;
-use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\PageSectionController;
-use App\Http\Controllers\Admin\GalleryController;
-use App\Http\Controllers\Admin\ServiceController;
-use App\Http\Controllers\Admin\SettingController;
-use App\Http\Controllers\Admin\PasswordController;
-use App\Http\Controllers\Admin\ForgotPasswordController;
-use App\Http\Controllers\Admin\ResetPasswordController;
-use App\Http\Controllers\Admin\InquiryController as AdminInquiryController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,11 +25,12 @@ use App\Http\Controllers\Admin\InquiryController as AdminInquiryController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-Route::get('/',          [PageController::class, 'home'])->name('home');
-Route::get('/about',     [PageController::class, 'about'])->name('about');
-Route::get('/services',  [PageController::class, 'services'])->name('services');
-Route::get('/gallery',   [PageController::class, 'gallery'])->name('gallery');
-Route::get('/contacts',  [PageController::class, 'contacts'])->name('contacts');
+Route::get('/', [PageController::class, 'home'])->name('home');
+Route::get('/about', [PageController::class, 'about'])->name('about');
+Route::get('/services', [PageController::class, 'services'])->name('services');
+Route::get('/services/{slug}', [PageController::class, 'serviceShow'])->name('services.show');
+Route::get('/gallery', [PageController::class, 'gallery'])->name('gallery');
+Route::get('/contacts', [PageController::class, 'contacts'])->name('contacts');
 Route::post('/contact', [InquiryController::class, 'submit'])->name('inquiry.submit')->middleware('throttle:contact-form');
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 Route::get('/robots.txt', function () {
@@ -39,7 +40,7 @@ Route::get('/robots.txt', function () {
         '',
         'Disallow: /admin',
         '',
-        'Sitemap: ' . url('/sitemap.xml'),
+        'Sitemap: '.url('/sitemap.xml'),
     ];
 
     return response(implode("\n", $lines), 200)

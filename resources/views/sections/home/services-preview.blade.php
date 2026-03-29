@@ -40,7 +40,10 @@
                         @endif
 
                         <h3 class="text-base font-semibold text-gray-900">
-                            {{ $service->title }}
+                            <a href="{{ route('services.show', $service->slug) }}"
+                               class="text-gray-900 underline-offset-2 hover:underline">
+                                {{ $service->title }}
+                            </a>
                         </h3>
 
                         @if($service->short_description)

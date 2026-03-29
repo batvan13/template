@@ -142,7 +142,30 @@
                        font-mono text-xs focus:outline-none focus:border-gray-500 transition-colors
                        {{ $errors->has('video_url') ? 'border-red-300 bg-red-50' : 'border-gray-200' }}"
             >
-            <p class="mt-1.5 text-xs text-gray-400">Препоръчително: YouTube линк — показва се миниатюра автоматично. Vimeo и други платформи се запазват и линкват, но без миниатюра.</p>
+            <p class="mt-1.5 text-xs text-gray-500 leading-relaxed">
+                <span class="font-medium text-gray-800">Поддържат се само YouTube видео линкове</span>
+                (напр. <span class="font-mono text-gray-600">youtube.com/watch?v=…</span>,
+                <span class="font-mono text-gray-600">youtu.be/…</span>,
+                <span class="font-mono text-gray-600">youtube.com/shorts/…</span>,
+                <span class="font-mono text-gray-600">youtube.com/embed/…</span>).
+                Други платформи не се вграждат в публичната галерия.
+            </p>
+            @if(isset($item) && $item->isVideo())
+                @php
+                    $videoUrlForHint = old('video_url', $item->video_url ?? '');
+                    $parsedYoutube = \App\Support\GalleryVideoEmbedNormalizer::parse($videoUrlForHint);
+                @endphp
+                @if($parsedYoutube)
+                    <p class="mt-2 text-xs text-gray-600">
+                        Открит формат:
+                        <span class="font-semibold text-gray-900">YouTube</span>
+                    </p>
+                @elseif($videoUrlForHint !== '')
+                    <p class="mt-2 text-xs text-amber-800 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2">
+                        Текущият линк не е приемлив YouTube адрес. В публичната галерия няма да се покаже вграден плеър — подменете го с валиден YouTube линк и запазете.
+                    </p>
+                @endif
+            @endif
             @error('video_url')
                 <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
             @enderror

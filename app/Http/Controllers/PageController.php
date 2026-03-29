@@ -4,13 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\GalleryItem;
 use App\Models\Service;
+use Illuminate\Http\Request;
 
 class PageController extends Controller
 {
     public function home()
     {
         return view('pages.home', [
-            'homeServices'        => Service::active()->ordered()->limit(3)->get(),
+            'homeServices' => Service::active()->ordered()->limit(3)->get(),
             'galleryPreviewItems' => GalleryItem::active()->ordered()->limit(6)->get(),
         ]);
     }
@@ -18,7 +19,7 @@ class PageController extends Controller
     public function about()
     {
         return view('pages.about', [
-            'hero'    => page_section('about', 'hero'),
+            'hero' => page_section('about', 'hero'),
             'content' => page_section('about', 'content'),
         ]);
     }
@@ -26,40 +27,58 @@ class PageController extends Controller
     public function services()
     {
         return view('pages.services', [
-            'page'     => page_section('services', 'hero'),
+            'page' => page_section('services', 'hero'),
             'services' => Service::active()->ordered()->get(),
         ]);
     }
 
-    public function gallery()
+    public function gallery(Request $request)
     {
+        $filter = $request->query('type', 'all');
+        $allowed = ['all', GalleryItem::TYPE_IMAGE, GalleryItem::TYPE_VIDEO];
+        if (! in_array($filter, $allowed, true)) {
+            $filter = 'all';
+        }
+
+        $query = GalleryItem::active()->ordered();
+        if ($filter === GalleryItem::TYPE_IMAGE) {
+            $query->where('type', GalleryItem::TYPE_IMAGE);
+        } elseif ($filter === GalleryItem::TYPE_VIDEO) {
+            $query->where('type', GalleryItem::TYPE_VIDEO);
+        }
+
+        $items = $query->get();
+        $hasAnyActiveGalleryItems = GalleryItem::active()->exists();
+
         return view('pages.gallery', [
-            'hero'  => page_section('gallery', 'hero'),
-            'items' => GalleryItem::active()->ordered()->get(),
+            'hero' => page_section('gallery', 'hero'),
+            'items' => $items,
+            'galleryFilter' => $filter,
+            'hasAnyActiveGalleryItems' => $hasAnyActiveGalleryItems,
         ]);
     }
 
     public function contacts()
     {
-        $email    = setting('contact_email');
-        $phone    = setting('contact_phone');
-        $address  = setting('address');
+        $email = setting('contact_email');
+        $phone = setting('contact_phone');
+        $address = setting('address');
         $facebook = setting('facebook_url');
         $instagram = setting('instagram_url');
-        $youtube  = setting('youtube_url');
+        $youtube = setting('youtube_url');
 
         return view('pages.contacts', [
-            'hero'       => page_section('contacts', 'hero'),
-            'content'    => page_section('contacts', 'content'),
-            'email'      => $email,
-            'phone'      => $phone,
-            'address'    => $address,
-            'tel'        => $phone ? ('tel:' . preg_replace('/[^\d+]/', '', $phone)) : null,
-            'facebook'   => $facebook,
-            'instagram'  => $instagram,
-            'youtube'    => $youtube,
+            'hero' => page_section('contacts', 'hero'),
+            'content' => page_section('contacts', 'content'),
+            'email' => $email,
+            'phone' => $phone,
+            'address' => $address,
+            'tel' => $phone ? ('tel:'.preg_replace('/[^\d+]/', '', $phone)) : null,
+            'facebook' => $facebook,
+            'instagram' => $instagram,
+            'youtube' => $youtube,
             'hasContact' => (bool) ($email || $phone || $address),
-            'hasSocial'  => (bool) ($facebook || $instagram || $youtube),
+            'hasSocial' => (bool) ($facebook || $instagram || $youtube),
         ]);
     }
 }

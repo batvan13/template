@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\GalleryVideoEmbedNormalizer;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -10,6 +11,7 @@ class GalleryItem extends Model
     use HasFactory;
 
     public const TYPE_IMAGE = 'image';
+
     public const TYPE_VIDEO = 'video';
 
     public const TYPES = [
@@ -22,12 +24,15 @@ class GalleryItem extends Model
         'type',
         'image_path',
         'video_url',
+        'video_platform',
+        'video_external_id',
+        'video_embed_url',
         'sort_order',
         'is_active',
     ];
 
     protected $casts = [
-        'is_active'  => 'boolean',
+        'is_active' => 'boolean',
         'sort_order' => 'integer',
     ];
 
@@ -61,9 +66,38 @@ class GalleryItem extends Model
         return $this->type === self::TYPE_VIDEO;
     }
 
+    public function resolvedVideoEmbedUrl(): ?string
+    {
+        if (! $this->isVideo()) {
+            return null;
+        }
+
+        $parsed = GalleryVideoEmbedNormalizer::parse((string) ($this->video_url ?? ''));
+
+        return $parsed['embed_url'] ?? null;
+    }
+
+    public function resolvedVideoPlatform(): ?string
+    {
+        if (! $this->isVideo()) {
+            return null;
+        }
+
+        $parsed = GalleryVideoEmbedNormalizer::parse((string) ($this->video_url ?? ''));
+
+        return $parsed['platform'] ?? null;
+    }
+
     /**
-     * Return a thumbnail URL for YouTube video items.
-     * Returns null for non-video items or unrecognised video platforms.
+     * Tailwind aspect classes for the public YouTube embed container.
+     */
+    public function videoEmbedAspectClass(): string
+    {
+        return 'aspect-video w-full';
+    }
+
+    /**
+     * Thumbnail for home preview when the stored URL is a recognised YouTube link.
      */
     public function videoThumbnailUrl(): ?string
     {
@@ -71,13 +105,11 @@ class GalleryItem extends Model
             return null;
         }
 
-        // Matches youtube.com/watch?v=ID and youtu.be/ID
         if (preg_match('/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/', $this->video_url, $m)) {
             return "https://img.youtube.com/vi/{$m[1]}/hqdefault.jpg";
         }
 
-        // Matches youtube.com/shorts/ID
-        if (preg_match('/youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/', $this->video_url, $m)) {
+        if (preg_match('/youtube\.com\/(?:shorts|embed|live)\/([a-zA-Z0-9_-]{11})/', $this->video_url, $m)) {
             return "https://img.youtube.com/vi/{$m[1]}/hqdefault.jpg";
         }
 

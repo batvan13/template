@@ -72,3 +72,19 @@
 - [ ] `php artisan config:clear && php artisan cache:clear`
 - [ ] `php artisan config:cache && php artisan route:cache && php artisan view:cache`
 - [ ] Confirm site loads correctly after caching
+
+## STORAGE
+
+- [ ] php artisan storage:link
+- [ ] Verify public/storage exists
+- [ ] Verify images are accessible via /storage/...
+
+⚠️ IMPORTANT
+
+After installation run:
+
+php artisan storage:link
+
+Otherwise uploaded images will not be accessible.
+
+

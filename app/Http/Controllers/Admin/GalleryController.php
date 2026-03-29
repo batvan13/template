@@ -7,6 +7,7 @@ use App\Http\Requests\Admin\StoreGalleryItemRequest;
 use App\Http\Requests\Admin\UpdateGalleryItemRequest;
 use App\Models\GalleryItem;
 use App\Support\GalleryImageProcessor;
+use App\Support\GalleryVideoEmbedNormalizer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -36,12 +37,15 @@ class GalleryController extends Controller
         $validated = $request->validated();
 
         $data = [
-            'title'      => $validated['title'] ?? null,
-            'type'       => $validated['type'],
+            'title' => $validated['title'] ?? null,
+            'type' => $validated['type'],
             'image_path' => null,
-            'video_url'  => null,
-            'sort_order' => (int)  ($validated['sort_order'] ?? 0),
-            'is_active'  => (bool) ($validated['is_active']  ?? false),
+            'video_url' => null,
+            'video_platform' => null,
+            'video_external_id' => null,
+            'video_embed_url' => null,
+            'sort_order' => (int) ($validated['sort_order'] ?? 0),
+            'is_active' => (bool) ($validated['is_active'] ?? false),
         ];
 
         if ($validated['type'] === GalleryItem::TYPE_IMAGE) {
@@ -66,7 +70,16 @@ class GalleryController extends Controller
                     ->withErrors(['image' => 'Грешка при запис на изображението.']);
             }
         } else {
-            $data['video_url'] = $validated['video_url'];
+            $parsed = GalleryVideoEmbedNormalizer::parse($validated['video_url']);
+            if ($parsed === null) {
+                return back()
+                    ->withInput()
+                    ->withErrors(['video_url' => 'Невалиден YouTube линк. Поддържат се само публични YouTube видеа.']);
+            }
+            $data['video_url'] = $parsed['canonical_url'];
+            $data['video_platform'] = $parsed['platform'];
+            $data['video_external_id'] = $parsed['external_id'];
+            $data['video_embed_url'] = $parsed['embed_url'];
             GalleryItem::create($data);
         }
 
@@ -75,27 +88,30 @@ class GalleryController extends Controller
             ->with('success', 'Записът беше добавен успешно.');
     }
 
-    public function edit(GalleryItem $galleryItem)
+    public function edit(GalleryItem $gallery)
     {
-        return view('admin.gallery.edit', compact('galleryItem'));
+        return view('admin.gallery.edit', ['galleryItem' => $gallery]);
     }
 
-    public function update(UpdateGalleryItemRequest $request, GalleryItem $galleryItem)
+    public function update(UpdateGalleryItemRequest $request, GalleryItem $gallery)
     {
         $validated = $request->validated();
 
         $data = [
-            'title'      => $validated['title'] ?? null,
-            'type'       => $validated['type'],
+            'title' => $validated['title'] ?? null,
+            'type' => $validated['type'],
             'image_path' => null,
-            'video_url'  => null,
-            'sort_order' => (int)  ($validated['sort_order'] ?? 0),
-            'is_active'  => (bool) ($validated['is_active']  ?? false),
+            'video_url' => null,
+            'video_platform' => null,
+            'video_external_id' => null,
+            'video_embed_url' => null,
+            'sort_order' => (int) ($validated['sort_order'] ?? 0),
+            'is_active' => (bool) ($validated['is_active'] ?? false),
         ];
 
         if ($validated['type'] === GalleryItem::TYPE_IMAGE) {
             if ($request->hasFile('image')) {
-                $oldPath = $galleryItem->image_path;
+                $oldPath = $gallery->image_path;
                 $newPath = null;
 
                 try {
@@ -109,7 +125,7 @@ class GalleryController extends Controller
                 $data['image_path'] = $newPath;
 
                 try {
-                    $galleryItem->update($data);
+                    $gallery->update($data);
                 } catch (\Throwable $e) {
                     if ($newPath && Storage::disk('public')->exists($newPath)) {
                         Storage::disk('public')->delete($newPath);
@@ -124,15 +140,24 @@ class GalleryController extends Controller
                     Storage::disk('public')->delete($oldPath);
                 }
             } else {
-                $data['image_path'] = $galleryItem->image_path;
-                $galleryItem->update($data);
+                $data['image_path'] = $gallery->image_path;
+                $gallery->update($data);
             }
         } else {
-            if ($galleryItem->image_path) {
-                Storage::disk('public')->delete($galleryItem->image_path);
+            if ($gallery->image_path) {
+                Storage::disk('public')->delete($gallery->image_path);
             }
-            $data['video_url'] = $validated['video_url'];
-            $galleryItem->update($data);
+            $parsed = GalleryVideoEmbedNormalizer::parse($validated['video_url']);
+            if ($parsed === null) {
+                return back()
+                    ->withInput()
+                    ->withErrors(['video_url' => 'Невалиден YouTube линк. Поддържат се само публични YouTube видеа.']);
+            }
+            $data['video_url'] = $parsed['canonical_url'];
+            $data['video_platform'] = $parsed['platform'];
+            $data['video_external_id'] = $parsed['external_id'];
+            $data['video_embed_url'] = $parsed['embed_url'];
+            $gallery->update($data);
         }
 
         return redirect()
@@ -140,18 +165,24 @@ class GalleryController extends Controller
             ->with('success', 'Записът беше обновен успешно.');
     }
 
-    public function destroy(GalleryItem $galleryItem)
+    public function destroy(GalleryItem $gallery)
     {
-        if ($galleryItem->image_path) {
-            Storage::disk('public')->delete($galleryItem->image_path);
+        if (! $gallery->exists) {
+            return redirect()
+                ->back()
+                ->with('error', 'Записът не беше намерен или вече е изтрит.');
         }
 
-        $title = $galleryItem->title ?: ('Запис #' . $galleryItem->id);
-        $galleryItem->delete();
+        if ($gallery->image_path) {
+            Storage::disk('public')->delete($gallery->image_path);
+        }
+
+        $title = $gallery->title ?: ('Запис #'.$gallery->id);
+        $gallery->delete();
 
         return redirect()
             ->route('admin.gallery.index')
-            ->with('success', '"' . $title . '" беше изтрит.');
+            ->with('success', '"'.$title.'" беше изтрит.');
     }
 
     public function toggle(GalleryItem $galleryItem)
@@ -159,10 +190,10 @@ class GalleryController extends Controller
         $newStatus = ! $galleryItem->is_active;
         $galleryItem->update(['is_active' => $newStatus]);
 
-        $title   = $galleryItem->title ?: ('Запис #' . $galleryItem->id);
+        $title = $galleryItem->title ?: ('Запис #'.$galleryItem->id);
         $message = $newStatus
-            ? '"' . $title . '" е активиран.'
-            : '"' . $title . '" е деактивиран.';
+            ? '"'.$title.'" е активиран.'
+            : '"'.$title.'" е деактивиран.';
 
         return redirect()
             ->route('admin.gallery.index')

@@ -19,6 +19,10 @@ class DashboardController extends Controller
             'totalSettings'  => SiteSetting::count(),
             'totalGallery'   => GalleryItem::count(),
             'activeGallery'  => GalleryItem::where('is_active', true)->count(),
+            'homeFaqSection' => PageSection::query()
+                ->where('page', 'home')
+                ->where('section', 'faq')
+                ->first(),
         ]);
     }
 }

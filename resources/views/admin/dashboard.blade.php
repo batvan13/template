@@ -79,6 +79,17 @@
             <span class="text-gray-300 group-hover:text-gray-600 transition-colors text-lg leading-none">→</span>
         </a>
 
+        @if ($homeFaqSection)
+            <a href="{{ route('admin.sections.edit', $homeFaqSection) }}"
+               class="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors group">
+                <div>
+                    <p class="text-sm font-medium text-gray-900">Начална страница — ЧЗВ</p>
+                    <p class="text-xs text-gray-400 mt-0.5">Редактирай FAQ блока на началната страница</p>
+                </div>
+                <span class="text-gray-300 group-hover:text-gray-600 transition-colors text-lg leading-none">→</span>
+            </a>
+        @endif
+
         <a href="{{ route('admin.settings.edit') }}"
            class="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors group">
             <div>

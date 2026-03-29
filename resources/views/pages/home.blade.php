@@ -7,7 +7,7 @@
     @include('sections.home.hero')
     @include('sections.home.services-preview')
     @include('sections.home.about-preview')
-    @include('sections.home.faq')
     @include('sections.home.gallery-preview')
     @include('sections.home.contact-preview')
+    @include('sections.home.faq')
 @endsection

@@ -41,139 +41,143 @@
             </div>
         @endif
 
-        {{-- Form card --}}
-        <div class="bg-white border border-gray-200 rounded-xl shadow-sm divide-y divide-gray-100">
+        @if ($pageSection->page === 'home' && $pageSection->section === 'faq')
+            @include('admin.sections._form-home-faq', ['pageSection' => $pageSection])
+        @else
+            {{-- Form card --}}
+            <div class="bg-white border border-gray-200 rounded-xl shadow-sm divide-y divide-gray-100">
 
-            {{-- Section: Основно съдържание --}}
-            <div class="px-8 py-6 space-y-5">
+                {{-- Section: Основно съдържание --}}
+                <div class="px-8 py-6 space-y-5">
 
-                <p class="text-xs font-bold tracking-widest uppercase text-gray-400">Основно съдържание</p>
+                    <p class="text-xs font-bold tracking-widest uppercase text-gray-400">Основно съдържание</p>
 
-                {{-- Title --}}
-                <div>
-                    <label for="title" class="block text-sm font-medium text-gray-700 mb-1.5">
-                        Заглавие
-                    </label>
-                    <input
-                        type="text"
-                        id="title"
-                        name="title"
-                        value="{{ old('title', $pageSection->title) }}"
-                        autofocus
-                        class="w-full px-3 py-2 border rounded text-sm text-gray-900 placeholder-gray-400
-                               focus:outline-none focus:border-gray-500 transition-colors
-                               {{ $errors->has('title') ? 'border-red-300 bg-red-50' : 'border-gray-200' }}"
-                    >
-                    @error('title')
-                        <p class="mt-1.5 text-xs text-red-500">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                {{-- Subtitle --}}
-                <div>
-                    <label for="subtitle" class="block text-sm font-medium text-gray-700 mb-1.5">
-                        Подзаглавие
-                    </label>
-                    <input
-                        type="text"
-                        id="subtitle"
-                        name="subtitle"
-                        value="{{ old('subtitle', $pageSection->subtitle) }}"
-                        class="w-full px-3 py-2 border rounded text-sm text-gray-900 placeholder-gray-400
-                               focus:outline-none focus:border-gray-500 transition-colors
-                               {{ $errors->has('subtitle') ? 'border-red-300 bg-red-50' : 'border-gray-200' }}"
-                    >
-                    @error('subtitle')
-                        <p class="mt-1.5 text-xs text-red-500">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                {{-- Content --}}
-                <div>
-                    <label for="content" class="block text-sm font-medium text-gray-700 mb-1.5">
-                        Съдържание
-                    </label>
-                    <textarea
-                        id="content"
-                        name="content"
-                        rows="6"
-                        class="w-full px-3 py-2 border rounded text-sm text-gray-900 placeholder-gray-400
-                               focus:outline-none focus:border-gray-500 transition-colors resize-y
-                               {{ $errors->has('content') ? 'border-red-300 bg-red-50' : 'border-gray-200' }}"
-                    >{{ old('content', $pageSection->content) }}</textarea>
-                    @error('content')
-                        <p class="mt-1.5 text-xs text-red-500">{{ $message }}</p>
-                    @enderror
-                </div>
-
-            </div>
-
-            {{-- Section: Бутон --}}
-            <div class="px-8 py-6 space-y-5">
-
-                <p class="text-xs font-bold tracking-widest uppercase text-gray-400">Бутон</p>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-
-                    {{-- Button text --}}
+                    {{-- Title --}}
                     <div>
-                        <label for="meta_button_text" class="block text-sm font-medium text-gray-700 mb-1.5">
-                            Текст на бутона
+                        <label for="title" class="block text-sm font-medium text-gray-700 mb-1.5">
+                            Заглавие
                         </label>
                         <input
                             type="text"
-                            id="meta_button_text"
-                            name="meta[button_text]"
-                            value="{{ old('meta.button_text', $pageSection->meta['button_text'] ?? '') }}"
-                            placeholder="Напр. Научи повече"
+                            id="title"
+                            name="title"
+                            value="{{ old('title', $pageSection->title) }}"
+                            autofocus
                             class="w-full px-3 py-2 border rounded text-sm text-gray-900 placeholder-gray-400
                                    focus:outline-none focus:border-gray-500 transition-colors
-                                   {{ $errors->has('meta.button_text') ? 'border-red-300 bg-red-50' : 'border-gray-200' }}"
+                                   {{ $errors->has('title') ? 'border-red-300 bg-red-50' : 'border-gray-200' }}"
                         >
-                        @error('meta.button_text')
+                        @error('title')
                             <p class="mt-1.5 text-xs text-red-500">{{ $message }}</p>
                         @enderror
                     </div>
 
-                    {{-- Button URL --}}
+                    {{-- Subtitle --}}
                     <div>
-                        <label for="meta_button_url" class="block text-sm font-medium text-gray-700 mb-1.5">
-                            URL на бутона
+                        <label for="subtitle" class="block text-sm font-medium text-gray-700 mb-1.5">
+                            Подзаглавие
                         </label>
                         <input
                             type="text"
-                            id="meta_button_url"
-                            name="meta[button_url]"
-                            value="{{ old('meta.button_url', $pageSection->meta['button_url'] ?? '') }}"
-                            placeholder="/services"
+                            id="subtitle"
+                            name="subtitle"
+                            value="{{ old('subtitle', $pageSection->subtitle) }}"
                             class="w-full px-3 py-2 border rounded text-sm text-gray-900 placeholder-gray-400
-                                   font-mono focus:outline-none focus:border-gray-500 transition-colors
-                                   {{ $errors->has('meta.button_url') ? 'border-red-300 bg-red-50' : 'border-gray-200' }}"
+                                   focus:outline-none focus:border-gray-500 transition-colors
+                                   {{ $errors->has('subtitle') ? 'border-red-300 bg-red-50' : 'border-gray-200' }}"
                         >
-                        @error('meta.button_url')
+                        @error('subtitle')
+                            <p class="mt-1.5 text-xs text-red-500">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    {{-- Content --}}
+                    <div>
+                        <label for="content" class="block text-sm font-medium text-gray-700 mb-1.5">
+                            Съдържание
+                        </label>
+                        <textarea
+                            id="content"
+                            name="content"
+                            rows="6"
+                            class="w-full px-3 py-2 border rounded text-sm text-gray-900 placeholder-gray-400
+                                   focus:outline-none focus:border-gray-500 transition-colors resize-y
+                                   {{ $errors->has('content') ? 'border-red-300 bg-red-50' : 'border-gray-200' }}"
+                        >{{ old('content', $pageSection->content) }}</textarea>
+                        @error('content')
                             <p class="mt-1.5 text-xs text-red-500">{{ $message }}</p>
                         @enderror
                     </div>
 
                 </div>
 
-            </div>
+                {{-- Section: Бутон --}}
+                <div class="px-8 py-6 space-y-5">
 
-            {{-- Actions --}}
-            <div class="px-8 py-5 bg-gray-50 rounded-b-xl flex items-center gap-4">
-                <button
-                    type="submit"
-                    class="px-5 py-2 bg-gray-900 text-white text-sm font-medium rounded
-                           hover:bg-gray-700 transition-colors">
-                    Запази промените
-                </button>
-                <a href="{{ route('admin.sections.index') }}"
-                   class="text-sm text-gray-400 hover:text-gray-900 transition-colors">
-                    Отказ
-                </a>
-            </div>
+                    <p class="text-xs font-bold tracking-widest uppercase text-gray-400">Бутон</p>
 
-        </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+
+                        {{-- Button text --}}
+                        <div>
+                            <label for="meta_button_text" class="block text-sm font-medium text-gray-700 mb-1.5">
+                                Текст на бутона
+                            </label>
+                            <input
+                                type="text"
+                                id="meta_button_text"
+                                name="meta[button_text]"
+                                value="{{ old('meta.button_text', $pageSection->meta['button_text'] ?? '') }}"
+                                placeholder="Напр. Научи повече"
+                                class="w-full px-3 py-2 border rounded text-sm text-gray-900 placeholder-gray-400
+                                       focus:outline-none focus:border-gray-500 transition-colors
+                                       {{ $errors->has('meta.button_text') ? 'border-red-300 bg-red-50' : 'border-gray-200' }}"
+                            >
+                            @error('meta.button_text')
+                                <p class="mt-1.5 text-xs text-red-500">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        {{-- Button URL --}}
+                        <div>
+                            <label for="meta_button_url" class="block text-sm font-medium text-gray-700 mb-1.5">
+                                URL на бутона
+                            </label>
+                            <input
+                                type="text"
+                                id="meta_button_url"
+                                name="meta[button_url]"
+                                value="{{ old('meta.button_url', $pageSection->meta['button_url'] ?? '') }}"
+                                placeholder="/services"
+                                class="w-full px-3 py-2 border rounded text-sm text-gray-900 placeholder-gray-400
+                                       font-mono focus:outline-none focus:border-gray-500 transition-colors
+                                       {{ $errors->has('meta.button_url') ? 'border-red-300 bg-red-50' : 'border-gray-200' }}"
+                            >
+                            @error('meta.button_url')
+                                <p class="mt-1.5 text-xs text-red-500">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                    </div>
+
+                </div>
+
+                {{-- Actions --}}
+                <div class="px-8 py-5 bg-gray-50 rounded-b-xl flex items-center gap-4">
+                    <button
+                        type="submit"
+                        class="px-5 py-2 bg-gray-900 text-white text-sm font-medium rounded
+                               hover:bg-gray-700 transition-colors">
+                        Запази промените
+                    </button>
+                    <a href="{{ route('admin.sections.index') }}"
+                       class="text-sm text-gray-400 hover:text-gray-900 transition-colors">
+                        Отказ
+                    </a>
+                </div>
+
+            </div>
+        @endif
 
     </form>
 

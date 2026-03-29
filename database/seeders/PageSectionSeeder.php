@@ -69,6 +69,15 @@ class PageSectionSeeder extends Seeder
                 ],
             ],
             [
+                'page' => 'home',
+                'section' => 'faq',
+                'title' => null,
+                'subtitle' => null,
+                'content' => null,
+                'meta' => null,
+                'faq' => null,
+            ],
+            [
                 'page' => 'about',
                 'section' => 'hero',
                 'title' => 'За нашия бизнес',
@@ -122,17 +131,22 @@ class PageSectionSeeder extends Seeder
         ];
 
         foreach ($sections as $section) {
+            $values = [
+                'title' => $section['title'],
+                'subtitle' => $section['subtitle'],
+                'content' => $section['content'],
+                'meta' => $section['meta'],
+            ];
+            if (array_key_exists('faq', $section)) {
+                $values['faq'] = $section['faq'];
+            }
+
             PageSection::updateOrCreate(
                 [
                     'page' => $section['page'],
                     'section' => $section['section'],
                 ],
-                [
-                    'title' => $section['title'],
-                    'subtitle' => $section['subtitle'],
-                    'content' => $section['content'],
-                    'meta' => $section['meta'],
-                ]
+                $values
             );
         }
     }

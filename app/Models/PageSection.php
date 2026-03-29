@@ -16,10 +16,12 @@ class PageSection extends Model
         'subtitle',
         'content',
         'meta',
+        'faq',
     ];
 
     protected $casts = [
         'meta' => 'array',
+        'faq' => 'array',
     ];
 
     public function getButtonTextAttribute(): ?string

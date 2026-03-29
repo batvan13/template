@@ -11,10 +11,44 @@ class PageController extends Controller
 {
     public function home()
     {
+        $homeFaqSection = page_section('home', 'faq');
+
         return view('pages.home', [
             'homeServices' => Service::active()->ordered()->limit(3)->get(),
             'galleryPreviewItems' => GalleryItem::active()->ordered()->limit(6)->get(),
+            'homeFaqSection' => $homeFaqSection,
+            'homeFaqItems' => $this->filteredHomeFaqItems($homeFaqSection?->faq),
         ]);
+    }
+
+    /**
+     * Defensive FAQ list for homepage (canonical shape enforced in admin).
+     *
+     * @return list<array{question: string, answer: string}>
+     */
+    private function filteredHomeFaqItems(mixed $faq): array
+    {
+        if (! is_array($faq)) {
+            return [];
+        }
+
+        $items = [];
+        foreach ($faq as $row) {
+            if (! is_array($row)) {
+                continue;
+            }
+            $question = trim((string) ($row['question'] ?? ''));
+            $answer = trim((string) ($row['answer'] ?? ''));
+            if ($question === '' || $answer === '') {
+                continue;
+            }
+            $items[] = [
+                'question' => $question,
+                'answer' => $answer,
+            ];
+        }
+
+        return $items;
     }
 
     public function about()

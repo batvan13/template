@@ -7,6 +7,7 @@ use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class ServiceController extends Controller
 {
@@ -28,15 +29,9 @@ class ServiceController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'title'             => ['required', 'string', 'max:255'],
-            'slug'              => ['nullable', 'string', 'max:255', 'unique:services,slug'],
-            'short_description' => ['nullable', 'string'],
-            'full_description'  => ['nullable', 'string'],
-            'icon'              => ['nullable', 'string', 'max:255'],
-            'is_active'         => ['boolean'],
-            'sort_order'        => ['integer', 'min:0'],
-        ]);
+        $validated = $request->validate($this->serviceValidationRules());
+
+        $validated['faq'] = $this->normalizeFaqForPersistence($request->input('faq'));
 
         Service::create($this->prepare($validated));
 
@@ -51,15 +46,9 @@ class ServiceController extends Controller
 
     public function update(Request $request, Service $service)
     {
-        $validated = $request->validate([
-            'title'             => ['required', 'string', 'max:255'],
-            'slug'              => ['nullable', 'string', 'max:255', Rule::unique('services', 'slug')->ignore($service->id)],
-            'short_description' => ['nullable', 'string'],
-            'full_description'  => ['nullable', 'string'],
-            'icon'              => ['nullable', 'string', 'max:255'],
-            'is_active'         => ['boolean'],
-            'sort_order'        => ['integer', 'min:0'],
-        ]);
+        $validated = $request->validate($this->serviceValidationRules($service));
+
+        $validated['faq'] = $this->normalizeFaqForPersistence($request->input('faq'));
 
         $service->update($this->prepare($validated, $service));
 
@@ -90,6 +79,68 @@ class ServiceController extends Controller
         $data['sort_order'] = (int)  ($data['sort_order'] ?? 0);
 
         return $data;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function serviceValidationRules(?Service $forUpdate = null): array
+    {
+        $slugRule = ['nullable', 'string', 'max:255', 'unique:services,slug'];
+        if ($forUpdate !== null) {
+            $slugRule = ['nullable', 'string', 'max:255', Rule::unique('services', 'slug')->ignore($forUpdate->id)];
+        }
+
+        return [
+            'title'               => ['required', 'string', 'max:255'],
+            'slug'                => $slugRule,
+            'short_description'   => ['nullable', 'string'],
+            'full_description'    => ['nullable', 'string'],
+            'icon'                => ['nullable', 'string', 'max:255'],
+            'is_active'           => ['boolean'],
+            'sort_order'          => ['integer', 'min:0'],
+            'faq'                 => ['nullable', 'array'],
+            'faq.*.question'      => ['nullable', 'string', 'max:2000'],
+            'faq.*.answer'        => ['nullable', 'string', 'max:20000'],
+        ];
+    }
+
+    /**
+     * @return list<array{question: string, answer: string}>|null
+     */
+    private function normalizeFaqForPersistence(mixed $faq): ?array
+    {
+        if (! is_array($faq)) {
+            return null;
+        }
+
+        $items = [];
+        foreach ($faq as $row) {
+            if (! is_array($row)) {
+                continue;
+            }
+            $question = trim((string) ($row['question'] ?? ''));
+            $answer = trim((string) ($row['answer'] ?? ''));
+
+            if ($question === '' && $answer === '') {
+                continue;
+            }
+
+            if ($question === '' || $answer === '') {
+                throw ValidationException::withMessages([
+                    'faq' => [
+                        'Всеки ред с попълнено поле трябва да има и въпрос, и отговор. Изтрий текста от едното поле или допълни другото.',
+                    ],
+                ]);
+            }
+
+            $items[] = [
+                'question' => $question,
+                'answer' => $answer,
+            ];
+        }
+
+        return $items === [] ? null : $items;
     }
 
     public function destroy(Service $service)

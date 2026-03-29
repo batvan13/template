@@ -119,6 +119,78 @@
 
     </div>
 
+    {{-- ── Секция: Често задавани въпроси ─────────────────────── --}}
+    <div class="px-8 py-6 space-y-5">
+
+        @php
+            if (session()->hasOldInput('faq')) {
+                $oldFaq = old('faq');
+                $faqRows = is_array($oldFaq) ? array_values($oldFaq) : [];
+            } elseif (isset($service) && is_array($service->faq ?? null) && count($service->faq) > 0) {
+                $faqRows = [];
+                foreach ($service->faq as $row) {
+                    if (! is_array($row)) {
+                        continue;
+                    }
+                    $faqRows[] = [
+                        'question' => (string) ($row['question'] ?? ''),
+                        'answer' => (string) ($row['answer'] ?? ''),
+                    ];
+                }
+            } else {
+                $faqRows = [['question' => '', 'answer' => '']];
+            }
+        @endphp
+
+        <p class="text-xs font-bold tracking-widest uppercase text-gray-400">Често задавани въпроси</p>
+        <p class="text-xs text-gray-500">
+            Празни редове се игнорират. За всеки ред са нужни и въпрос, и отговор.
+        </p>
+
+        @error('faq')
+            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+        @enderror
+
+        @foreach ($faqRows as $i => $row)
+            <div class="space-y-3 rounded-lg border border-gray-200 p-4">
+                <div>
+                    <label for="faq_{{ $i }}_question" class="block text-sm font-medium text-gray-700 mb-1.5">
+                        Въпрос
+                    </label>
+                    <input
+                        type="text"
+                        id="faq_{{ $i }}_question"
+                        name="faq[{{ $i }}][question]"
+                        value="{{ old('faq.'.$i.'.question', $row['question'] ?? '') }}"
+                        class="w-full px-3 py-2 border rounded text-sm text-gray-900 placeholder-gray-400
+                               focus:outline-none focus:border-gray-500 transition-colors
+                               {{ $errors->has('faq.'.$i.'.question') ? 'border-red-300 bg-red-50' : 'border-gray-200' }}"
+                    >
+                    @error('faq.'.$i.'.question')
+                        <p class="mt-1.5 text-xs text-red-500">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div>
+                    <label for="faq_{{ $i }}_answer" class="block text-sm font-medium text-gray-700 mb-1.5">
+                        Отговор
+                    </label>
+                    <textarea
+                        id="faq_{{ $i }}_answer"
+                        name="faq[{{ $i }}][answer]"
+                        rows="4"
+                        class="w-full px-3 py-2 border rounded text-sm text-gray-900 placeholder-gray-400
+                               focus:outline-none focus:border-gray-500 transition-colors resize-y
+                               {{ $errors->has('faq.'.$i.'.answer') ? 'border-red-300 bg-red-50' : 'border-gray-200' }}"
+                    >{{ old('faq.'.$i.'.answer', $row['answer'] ?? '') }}</textarea>
+                    @error('faq.'.$i.'.answer')
+                        <p class="mt-1.5 text-xs text-red-500">{{ $message }}</p>
+                    @enderror
+                </div>
+            </div>
+        @endforeach
+
+    </div>
+
     {{-- ── Секция: Настройки ────────────────────────────────── --}}
     <div class="px-8 py-6 space-y-5">
 

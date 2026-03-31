@@ -25,6 +25,12 @@
         </div>
     @endif
 
+    @if ($pageSection->page === 'home' && $pageSection->section === 'faq')
+        <div class="bg-white border border-gray-200 rounded-xl shadow-sm px-8 py-10 text-sm text-gray-600">
+            <p class="text-gray-900 font-medium mb-1">Секцията не се редактира от този панел</p>
+            <p class="text-gray-500">Тази секция е скрита за този проект.</p>
+        </div>
+    @else
     <form action="{{ route('admin.sections.update', $pageSection) }}" method="POST" novalidate>
         @csrf
         @method('PUT')
@@ -41,9 +47,6 @@
             </div>
         @endif
 
-        @if ($pageSection->page === 'home' && $pageSection->section === 'faq')
-            @include('admin.sections._form-home-faq', ['pageSection' => $pageSection])
-        @else
             {{-- Form card --}}
             <div class="bg-white border border-gray-200 rounded-xl shadow-sm divide-y divide-gray-100">
 
@@ -177,8 +180,8 @@
                 </div>
 
             </div>
-        @endif
 
     </form>
+    @endif
 
 @endsection

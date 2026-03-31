@@ -15,7 +15,6 @@ class PageController extends Controller
 
         return view('pages.home', [
             'homeServices' => Service::active()->ordered()->limit(3)->get(),
-            'galleryPreviewItems' => GalleryItem::active()->ordered()->limit(6)->get(),
             'homeFaqSection' => $homeFaqSection,
             'homeFaqItems' => $this->filteredHomeFaqItems($homeFaqSection?->faq),
         ]);

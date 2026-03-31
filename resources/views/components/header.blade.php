@@ -28,10 +28,6 @@
                class="{{ request()->routeIs('services', 'services.show') ? 'text-gray-900 font-semibold' : 'text-gray-500 hover:text-gray-900' }} transition-colors">
                 Услуги
             </a>
-            <a href="{{ route('gallery') }}"
-               class="{{ request()->routeIs('gallery') ? 'text-gray-900 font-semibold' : 'text-gray-500 hover:text-gray-900' }} transition-colors">
-                Галерия
-            </a>
             <a href="{{ route('blog') }}"
                class="{{ request()->routeIs('blog', 'blog.show') ? 'text-gray-900 font-semibold' : 'text-gray-500 hover:text-gray-900' }} transition-colors">
                 Блог
@@ -75,10 +71,6 @@
                 <a href="{{ route('services') }}"
                    class="{{ request()->routeIs('services', 'services.show') ? 'text-gray-900 font-semibold bg-gray-50' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50' }} rounded px-3 py-2.5 transition-colors">
                 Услуги
-            </a>
-            <a href="{{ route('gallery') }}"
-               class="{{ request()->routeIs('gallery') ? 'text-gray-900 font-semibold bg-gray-50' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50' }} rounded px-3 py-2.5 transition-colors">
-                Галерия
             </a>
             <a href="{{ route('blog') }}"
                class="{{ request()->routeIs('blog', 'blog.show') ? 'text-gray-900 font-semibold bg-gray-50' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50' }} rounded px-3 py-2.5 transition-colors">

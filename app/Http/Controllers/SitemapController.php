@@ -14,7 +14,6 @@ class SitemapController extends Controller
             route('home'),
             route('about'),
             route('services'),
-            route('gallery'),
             route('blog'),
             route('contacts'),
         ];

@@ -66,21 +66,13 @@
                             <td class="px-6 py-4 text-gray-400 font-mono text-xs">{{ $section->page }}</td>
                             <td class="px-6 py-4 text-gray-500 font-mono text-xs">{{ $section->section }}</td>
                             <td class="px-6 py-4 font-medium text-gray-900">
-                                @if ($section->page === 'home' && $section->section === 'faq')
-                                    Начална страница — ЧЗВ
-                                @else
-                                    {{ $section->title ?: '—' }}
-                                @endif
+                                {{ $section->title ?: '—' }}
                             </td>
                             <td class="px-6 py-4 text-right">
                                 <a href="{{ route('admin.sections.edit', $section) }}"
                                    class="text-xs px-3 py-1.5 rounded border border-gray-200
                                           text-gray-600 hover:border-gray-900 hover:text-gray-900 transition-colors">
-                                    @if ($section->page === 'home' && $section->section === 'faq')
-                                        Редактирай FAQ
-                                    @else
-                                        Редактирай
-                                    @endif
+                                    Редактирай
                                 </a>
                             </td>
                         </tr>

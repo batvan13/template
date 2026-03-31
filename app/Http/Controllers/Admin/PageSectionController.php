@@ -14,7 +14,11 @@ class PageSectionController extends Controller
         $sections = PageSection::query()
             ->orderBy('page')
             ->orderBy('section')
-            ->get();
+            ->get()
+            ->reject(fn (PageSection $section) => ($section->page === 'home' && $section->section === 'faq')
+                || ($section->page === 'home' && $section->section === 'gallery_preview')
+                || $section->page === 'gallery')
+            ->values();
 
         return view('admin.sections.index', compact('sections'));
     }

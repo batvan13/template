@@ -48,7 +48,9 @@ class ServiceController extends Controller
     {
         $validated = $request->validate($this->serviceValidationRules($service));
 
-        $validated['faq'] = $this->normalizeFaqForPersistence($request->input('faq'));
+        if ($request->has('faq')) {
+            $validated['faq'] = $this->normalizeFaqForPersistence($request->input('faq'));
+        }
 
         $service->update($this->prepare($validated, $service));
 

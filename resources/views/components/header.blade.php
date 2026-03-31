@@ -32,6 +32,10 @@
                class="{{ request()->routeIs('gallery') ? 'text-gray-900 font-semibold' : 'text-gray-500 hover:text-gray-900' }} transition-colors">
                 Галерия
             </a>
+            <a href="{{ route('blog') }}"
+               class="{{ request()->routeIs('blog', 'blog.show') ? 'text-gray-900 font-semibold' : 'text-gray-500 hover:text-gray-900' }} transition-colors">
+                Блог
+            </a>
             <a href="{{ route('contacts') }}"
                class="{{ request()->routeIs('contacts') ? 'border-gray-900 text-gray-900' : 'border-gray-300 text-gray-500 hover:border-gray-600 hover:text-gray-900' }} border rounded-full px-3 py-1 transition-colors">
                 Контакти
@@ -75,6 +79,10 @@
             <a href="{{ route('gallery') }}"
                class="{{ request()->routeIs('gallery') ? 'text-gray-900 font-semibold bg-gray-50' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50' }} rounded px-3 py-2.5 transition-colors">
                 Галерия
+            </a>
+            <a href="{{ route('blog') }}"
+               class="{{ request()->routeIs('blog', 'blog.show') ? 'text-gray-900 font-semibold bg-gray-50' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50' }} rounded px-3 py-2.5 transition-colors">
+                Блог
             </a>
             <div class="px-3 py-2">
                 <a href="{{ route('contacts') }}"

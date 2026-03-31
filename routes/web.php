@@ -7,9 +7,11 @@ use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\Admin\InquiryController as AdminInquiryController;
 use App\Http\Controllers\Admin\PageSectionController;
 use App\Http\Controllers\Admin\PasswordController;
+use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\ResetPasswordController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\BlogController;
 use App\Http\Controllers\InquiryController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\SitemapController;
@@ -30,6 +32,8 @@ Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/services', [PageController::class, 'services'])->name('services');
 Route::get('/services/{slug}', [PageController::class, 'serviceShow'])->name('services.show');
 Route::get('/gallery', [PageController::class, 'gallery'])->name('gallery');
+Route::get('/blog', [BlogController::class, 'index'])->name('blog');
+Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 Route::get('/contacts', [PageController::class, 'contacts'])->name('contacts');
 Route::post('/contact', [InquiryController::class, 'submit'])->name('inquiry.submit')->middleware('throttle:contact-form');
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
@@ -78,6 +82,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::patch('/services/{service}/toggle', [ServiceController::class, 'toggle'])
             ->name('services.toggle');
         Route::resource('services', ServiceController::class)
+            ->except(['show']);
+
+        Route::resource('posts', PostController::class)
             ->except(['show']);
 
         Route::patch('/gallery/{galleryItem}/toggle', [GalleryController::class, 'toggle'])

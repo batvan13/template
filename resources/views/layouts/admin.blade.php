@@ -49,6 +49,14 @@
                 Галерия
             </a>
 
+            <a href="{{ route('admin.posts.index') }}"
+               class="flex items-center gap-2.5 px-3 py-2 rounded text-sm transition-colors
+                      {{ request()->routeIs('admin.posts.*')
+                          ? 'bg-gray-900 text-white font-medium'
+                          : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900' }}">
+                Блог
+            </a>
+
             <a href="{{ route('admin.sections.index') }}"
                class="flex items-center gap-2.5 px-3 py-2 rounded text-sm transition-colors
                       {{ request()->routeIs('admin.sections.*')

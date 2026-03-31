@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Post;
 use App\Models\Service;
 use Illuminate\Http\Response;
 
@@ -14,11 +15,16 @@ class SitemapController extends Controller
             route('about'),
             route('services'),
             route('gallery'),
+            route('blog'),
             route('contacts'),
         ];
 
         foreach (Service::active()->ordered()->get() as $service) {
             $pages[] = route('services.show', $service->slug);
+        }
+
+        foreach (Post::published()->orderByDesc('published_at')->orderByDesc('id')->get() as $post) {
+            $pages[] = route('blog.show', $post->slug);
         }
 
         return response()

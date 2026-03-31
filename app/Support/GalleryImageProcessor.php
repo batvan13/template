@@ -16,7 +16,10 @@ class GalleryImageProcessor
 
     private const DIRECTORY = 'gallery';
 
-    public function process(UploadedFile $file): string
+    /**
+     * @param  string  $directory  Relative folder on the public disk (e.g. "gallery", "blog").
+     */
+    public function process(UploadedFile $file, string $directory = self::DIRECTORY): string
     {
         $manager = $this->createImageManager();
 
@@ -30,7 +33,7 @@ class GalleryImageProcessor
 
         $encoded = $image->toWebp(self::QUALITY);
 
-        $relativePath = self::DIRECTORY.'/'.Str::uuid()->toString().'.webp';
+        $relativePath = trim($directory, '/').'/'.Str::uuid()->toString().'.webp';
 
         Storage::disk('public')->put($relativePath, $encoded->toString());
 
